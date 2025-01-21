@@ -4,6 +4,7 @@ import (
   "os"
   "testing"
   "time"
+  "fmt"
 
   "github.com/stretchr/testify/assert"
   "github.com/joho/godotenv"
@@ -94,6 +95,7 @@ func TestAssistantStructuredOutputs(t *testing.T) {
   assert.NotNil(t, message, "Message should not be nil")
 
   t.Logf("Message Content%s", message.Content[0].Text.Value)
+  fmt.Printf("Message Content%s", message.Content[0].Text.Value)
 
   // Step 8: Cleanup Resources
   err = DeleteThread(threadID)

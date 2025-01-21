@@ -33,6 +33,8 @@ func CreateAssistant(instructions string, storeID string, schemaFilePath string)
 		return "", fmt.Errorf("error reading schema file: %w", err)
 	}
 
+  model := "gpt-4o-2024-08-06"
+
 	// Build the request payload
 	data := fmt.Sprintf(`{
 		"instructions": "%s",
@@ -40,7 +42,7 @@ func CreateAssistant(instructions string, storeID string, schemaFilePath string)
 		"tools": [
 			{"type": "file_search"}
 		],
-		"model": "gpt-4o-mini",
+		"model": "%s",
 		"tool_resources": {
 			"file_search": {
 				"vector_store_ids": ["%s"]
@@ -50,7 +52,7 @@ func CreateAssistant(instructions string, storeID string, schemaFilePath string)
       "type": "json_schema",
       "json_schema": %s
 	}
-}`, assistantInstructions, storeID, string(schemaData))
+}`, assistantInstructions, model, storeID, string(schemaData))
 
   // fmt.Println(data)
 
