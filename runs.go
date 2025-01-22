@@ -93,6 +93,8 @@ func GetRunStatus(run_id string, thread_id string) (string, error) {
 
 	m := b.(map[string]interface{})
 
+	fmt.Printf("%s\n", bodyText)
+
 	for k, v := range m {
 		if k == "status" {
 			run_status = v.(string)
@@ -101,6 +103,5 @@ func GetRunStatus(run_id string, thread_id string) (string, error) {
 		}
 	}
 
-	fmt.Printf("%s\n", bodyText)
 	return "Run Status not found.", nil
 }
