@@ -80,7 +80,7 @@ func CreateAssistant(instructions string, storeID string, schemaFilePath string)
 
   }
 
-   fmt.Println(data)
+   //fmt.Println(data)
 
 	req, err := http.NewRequest("POST", "https://api.openai.com/v1/assistants", strings.NewReader(data))
 	if err != nil {
