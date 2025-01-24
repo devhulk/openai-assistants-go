@@ -23,7 +23,7 @@ func TestAssistantStructuredOutputs(t *testing.T) {
   }
 
   // Define schema file path
-  schemaFilePath := "./structured_output_schema.json"
+  //schemaFilePath := "./structured_output_schema.json"
 
   // Step 1: Create a Vector Store
   vectorStoreID, err := CreateVectorStore("Test Vector Store")
@@ -32,7 +32,7 @@ func TestAssistantStructuredOutputs(t *testing.T) {
   t.Logf("Vector Store created: %s", vectorStoreID)
 
   // Step 2: Create an Assistant
-  assistantID, err := CreateAssistant("Generate structured outputs for testing.", vectorStoreID, schemaFilePath)
+  assistantID, err := CreateAssistant("You create value proposals.", vectorStoreID, "")
   assert.NoError(t, err, "Error creating assistant")
   assert.NotEmpty(t, assistantID, "Assistant ID should not be empty")
   t.Logf("Assistant created: %s", assistantID)

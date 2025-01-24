@@ -21,40 +21,66 @@ func CreateAssistant(instructions string, storeID string, schemaFilePath string)
 		assistantInstructions = "You are a business value assistant specializing in structured JSON outputs."
 	}
 
+  var schemaData []byte
+
 	// Load the schema from the file using os and io packages
-	file, err := os.Open(schemaFilePath)
-	if err != nil {
-		return "", fmt.Errorf("error opening schema file: %w", err)
-	}
-	defer file.Close()
+  if string(schemaFilePath) != "" {
+    file, err := os.Open(schemaFilePath)
+    if err != nil {
+      fmt.Println(err)
+      return "", fmt.Errorf("error opening schema file: %w", err)
+    }
+    defer file.Close()
 
-	schemaData, err := io.ReadAll(file)
-	if err != nil {
-		return "", fmt.Errorf("error reading schema file: %w", err)
-	}
+    schemaData, err = io.ReadAll(file)
+    if err != nil {
+      return "", fmt.Errorf("error reading schema file: %w", err)
+    }
 
-  model := "gpt-4o"
+  } 
 
-	// Build the request payload
-	data := fmt.Sprintf(`{
-		"instructions": "%s",
-		"name": "Test Assistant with Structured Outputs",
-		"tools": [
-			{"type": "file_search"}
-		],
-		"model": "%s",
-		"tool_resources": {
-			"file_search": {
-				"vector_store_ids": ["%s"]
-			}
-		},
-		"response_format": {
-      "type": "json_schema",
-      "json_schema": %s
-	}
-}`, assistantInstructions, model, storeID, string(schemaData))
+  model := "gpt-4o-mini"
+
 
   // fmt.Println(data)
+  var data string
+  if string(schemaData) != "" {
+      data = fmt.Sprintf(`{
+        "instructions": "%s",
+        "name": "Assistant with Structured Outputs",
+        "tools": [
+          {"type": "file_search"}
+        ],
+        "model": "%s",
+        "tool_resources": {
+          "file_search": {
+            "vector_store_ids": ["%s"]
+          }
+        },
+        "response_format": {
+           "type": "json_schema",
+           "json_schema": %s
+      }
+      }`, assistantInstructions, model, storeID, string(schemaData))
+
+  } else {
+      data = fmt.Sprintf(`{
+        "instructions": "%s",
+        "name": "Test Assistant",
+        "tools": [
+          {"type": "file_search"}
+        ],
+        "model": "%s",
+        "tool_resources": {
+          "file_search": {
+            "vector_store_ids": ["%s"]
+          }
+        }
+      }`, assistantInstructions, model, storeID)
+
+  }
+
+   fmt.Println(data)
 
 	req, err := http.NewRequest("POST", "https://api.openai.com/v1/assistants", strings.NewReader(data))
 	if err != nil {
@@ -80,14 +106,14 @@ func CreateAssistant(instructions string, storeID string, schemaFilePath string)
 	if err := json.Unmarshal(bodyText, &response); err != nil {
 		return "", fmt.Errorf("error unmarshaling response: %w", err)
 	}
+  // Useful when trying to troubleshoot schema
+  fmt.Println("Create Assistant Response: ", response)
 
 	if id, ok := response["id"].(string); ok {
 		assistantID = id
 		return assistantID, nil
 	}
 
-  // Useful when trying to troubleshoot schema
-  // fmt.Println("Create Assistant Response: ", response)
 
 	return "", fmt.Errorf("assistant ID not found in response: %s", string(bodyText))
 }
